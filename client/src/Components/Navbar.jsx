@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 
 
 const Navbar = () => {
+    const token = localStorage.getItem("token");
     return (
         <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 bg-white relative transition-all">
 
@@ -22,9 +23,15 @@ const Navbar = () => {
                         <path clip-rule="evenodd" d="M9.141 11.738c2.729-1.136 4.001-4.224 2.841-6.898S7.67.921 4.942 2.057C2.211 3.193.94 6.281 2.1 8.955s4.312 3.92 7.041 2.783" stroke="#7A7B7D" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </div> */}
-                <Link to='/login' className="cursor-pointer px-8 py-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full">
+                {
+                    token ? <Link to='/profile'>PROFILE</Link> :
+                    <Link to='/login' className="cursor-pointer px-8 py-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full">
                     Login
-                </Link>
+                   </Link>
+                }
+                {/* <Link to='/login' className="cursor-pointer px-8 py-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full">
+                    Login
+                </Link> */}
             </div>
         </nav>
     );
