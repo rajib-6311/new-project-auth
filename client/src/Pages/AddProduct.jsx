@@ -1,99 +1,172 @@
+import { useState } from "react";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { serverUrl } from "../../config.js";
+import { useNavigate } from "react-router-dom";
 
+const AddProduct = ({ token }) => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    description: "",
+    category: "",
+  });
+  const [image, setImage] = useState(null);
 
-const AddProduct = () => {
-    return (
-      <div className='flex justify-center items-center min-h-[calc(100vh-306px)] py-12 bg-gray-50'>
-        <section className=' p-2 md:p-6 mx-auto bg-white rounded-md shadow-md '>
-          <h2 className='text-lg font-semibold text-gray-700 capitalize '>
-            Post a Job
-          </h2>
-  
-          <form>
-            <div className='grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2'>
-              <div>
-                <label className='text-gray-700 ' htmlFor='job_title'>
-                  Job Title
-                </label>
-                <input
-                  id='job_title'
-                  name='job_title'
-                  type='text'
-                  className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
-                />
-              </div>
-  
-              <div>
-                <label className='text-gray-700 ' htmlFor='emailAddress'>
-                  Email Address
-                </label>
-                <input
-                  id='emailAddress'
-                  type='email'
-                  name='email'
-                  disabled
-                  
-                  className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
-                />
-              </div>
-              
-  
-              <div className='flex flex-col gap-2 '>
-                <label className='text-gray-700 ' htmlFor='category'>
-                  Category
-                </label>
-                <select
-                  name='category'
-                  id='category'
-                  className='border p-2 rounded-md'
-                >
-                  <option value='Web Development'>Web Development</option>
-                  <option value='Graphics Design'>Graphics Design</option>
-                  <option value='Digital Marketing'>Digital Marketing</option>
-                </select>
-              </div>
-              <div>
-                <label className='text-gray-700 ' htmlFor='min_price'>
-                  Minimum Price
-                </label>
-                <input
-                  id='min_price'
-                  name='min_price'
-                  type='number'
-                  className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
-                />
-              </div>
-  
-              <div>
-                <label className='text-gray-700 ' htmlFor='max_price'>
-                  Maximum Price
-                </label>
-                <input
-                  id='max_price'
-                  name='max_price'
-                  type='number'
-                  className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
-                />
-              </div>
-            </div>
-            <div className='flex flex-col gap-2 mt-4'>
-              <label className='text-gray-700 ' htmlFor='description'>
-                Description
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+  const handleUploadProduct = async (e) => {
+    e.preventDefault();
+    try {
+      const data = new FormData();
+
+      
+      Object.entries(formData).forEach(([key, value]) => {
+        data.append(key, value);
+      });
+
+      
+      if (image) {
+        data.append("image", image);
+      }
+
+      const response = await axios.post(`${serverUrl}/api/product/add`, data, {
+        headers: {
+          token,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      const responseData = response.data;
+
+      if (responseData?.success) {
+        toast.success(responseData?.message);
+        navigate("/list");
+      } else {
+        toast.error(responseData?.message);
+      }
+    } catch (error) {
+      console.error("Product data uploading error", error);
+      toast.error(error.message);
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center min-h-[calc(100vh-306px)] py-12 bg-gray-50">
+      <section className="p-2 md:p-6 mx-auto bg-white rounded-md shadow-md">
+        <h2 className="text-lg font-semibold text-gray-700 capitalize">
+          Add Product
+        </h2>
+
+        <form onSubmit={handleUploadProduct}>
+          <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+            {/* Product Name */}
+            <div>
+              <label className="text-gray-700" htmlFor="name">
+                Product Name
               </label>
-              <textarea
-                className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
-                name='description'
-                id='description'
-              ></textarea>
+              <input
+                id="name"
+                name="name"
+                onChange={handleChange}
+                value={formData.name}
+                type="text"
+                className="block w-full px-4 py-2 mt-2 border rounded-md"
+                required
+              />
             </div>
-            <div className='flex justify-end mt-6'>
-              <button className='px-8 py-2.5 leading-5 text-white transition-colors duration-300  bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600'>
-                Save
-              </button>
+
+            {/* Category */}
+            <div>
+              <label className="text-gray-700" htmlFor="category">
+                Category
+              </label>
+              <select
+                name="category"
+                onChange={handleChange}
+                value={formData.category}
+                id="category"
+                className="border p-2 rounded-md w-full"
+                required
+              >
+                <option value="">Select Category</option>
+                <option value="Web Development">Web Development</option>
+                <option value="Graphics Design">Graphics Design</option>
+                <option value="Digital Marketing">Digital Marketing</option>
+              </select>
             </div>
-          </form>
-        </section>
-      </div>
-    );
+
+            {/* Price */}
+            <div>
+              <label className="text-gray-700" htmlFor="price">
+                Price
+              </label>
+              <input
+                id="price"
+                name="price"
+                onChange={handleChange}
+                value={formData.price}
+                type="number"
+                className="block w-full px-4 py-2 mt-2 border rounded-md"
+                required
+              />
+            </div>
+
+            {/* Image Upload */}
+            <div>
+              <label className="text-gray-700" htmlFor="image">
+                Product Image
+              </label>
+              <input
+                id="image"
+                type="file"
+                onChange={handleFileChange}
+                className="block w-full px-4 py-2 mt-2 border rounded-md"
+                accept="image/*"
+              />
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="mt-4">
+            <label className="text-gray-700" htmlFor="description">
+              Description
+            </label>
+            <textarea
+              name="description"
+              id="description"
+              onChange={handleChange}
+              value={formData.description}
+              className="block w-full px-4 py-2 mt-2 border rounded-md"
+              rows="4"
+              required
+            ></textarea>
+          </div>
+
+          {/* Submit */}
+          <div className="flex justify-end mt-6">
+            <button
+              type="submit"
+              className="px-8 py-2.5 text-white bg-gray-700 rounded-md hover:bg-gray-600"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
 };
 
 export default AddProduct;

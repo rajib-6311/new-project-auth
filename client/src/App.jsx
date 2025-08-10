@@ -6,6 +6,7 @@ import Navbar from "./Components/Navbar";
 import AddProduct from "./Pages/AddProduct";
 import { Toaster } from 'react-hot-toast';
 import ProfilePage from "./Pages/ProfilePage";
+import ProductList from "./Pages/ProductList";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
        <Route path='/register' element={<Register/>}/>
        <Route path='/add-product' element={<AddProduct/>}/>
        <Route path='/profile' element={<ProfilePage/>}/>
+       <Route path='/list' element={<ProductList/>}/>
      </Routes>
     </>
   );

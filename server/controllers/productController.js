@@ -1,6 +1,6 @@
 import productModel from "../models/productModel.js";
 
-const addProducts = (req, res) => {
+const addProducts = async (req, res) => {
     try {
         const { _type, name, price, category, description } = req.body;
         // console.log(req.body);
@@ -29,8 +29,26 @@ const addProducts = (req, res) => {
     }
 };
 
-const listProduct = (req, res) => {};
-const singleProduct = (req, res) => {};
+const listProduct = async (req, res) => {
+  try{
+    const total = await productModel.countDocuments({});
+    const products = await productModel.find({});
+
+    res.send({
+        success:true,
+        total,
+        products
+    })
+
+  }catch(error){
+    console.log("Error", error)
+    res.json({
+        success:false,
+        message: error.message
+    })
+  }
+};
+const singleProduct =async (req, res) => {};
 
 export {
     addProducts,
