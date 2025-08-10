@@ -1,26 +1,69 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import {serverUrl} from '../../config'
 
 
 const Register = () => {
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false)
+
+    const navigate = useNavigate()
+    const token = localStorage.getItem("token");
+
+    useEffect(()=>{
+        if(token){
+            navigate('/')
+        }
+    },[token])
+
+    const handleName = (e)=>{
+        setName(e.target.value)
+    }
+    const handleEmail = (e)=>{
+        setEmail(e.target.value)
+    }
+    const handlePassword = (e)=>{
+        setPassword(e.target.value)
+    }
+
+    const handleRegister = async(e) =>{
+        e.preventDefault()
+        try{
+         setLoading(true)
+         if(name && email && password){
+            const response = await axios.post(`${serverUrl}/api/user/register`,{
+                name,
+                email,
+                password
+            })
+            const data = response?.data;
+            if(data?.success){
+              toast.success(data?.message)
+              navigate('/login')
+            }else{
+                toast.error(data?.message)
+            }
+         }
+        }catch(error){
+            console.error("User register error",error)
+            toast.error(error?.message)
+        }finally{
+            setLoading(false)
+        }
+    }
+
     return (
         <div className="min-h-screen bg-[linear-gradient(115deg,_#9F7AEA,_#FEE2FE)] py-20 text-black">
             <div className="container mx-auto">
                 <div className="w-5/12 bg-white mx-auto rounded-lg flex">
-                    {/* Left side with image */}
-                    {/* <div className="w-1/2 bg-[url(https://i.ibb.co/sJ9hjHV5/3d.jpg)] rounded-lg flex flex-col items-center justify-center bg-no-repeat bg-cover bg-center p-12">
-                        <h1 className="text-white text-5xl font-bold pb-3">Welcome</h1>
-                        <p className="text-white">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam
-                            assumenda hic molestias laudantium obcaecati, quasi dolore rem
-                            optio explicabo impedit iure, aliquam, quod facilis officiis.
-                        </p>
-                    </div> */}
-
-                    {/* Right side with form */}
+                                      
                     <div className="w-full p-6">
                         <h1 className="text-2xl font-bold pb-2">Register</h1>
-                        {/* <p className="pb-3">Lorem ipsum dolor sit amet consectetur, adipisicing.</p> */}
-
+                       
                         <form>
                             <div>
                                 <input
@@ -28,9 +71,9 @@ const Register = () => {
                                     placeholder="First Name"
                                     name="first_name"
                                     className="border border-gray-500 py-1 px-2 w-full"
-                                    // onChange={(e) => setFirstName(e.target.value)}
-                                />
-                               
+                                    value={name}
+                                    onChange={handleName}
+                                />                             
                             </div>
 
                             <div>
@@ -39,7 +82,8 @@ const Register = () => {
                                     placeholder="Email"
                                     name="email"
                                     className="border border-gray-500 py-1 px-2 w-full mt-5"
-                                    // onChange={(e) => setEmail(e.target.value)}
+                                    value={email}
+                                    onChange={handleEmail}
                                 />
                             </div>
 
@@ -49,7 +93,8 @@ const Register = () => {
                                     placeholder="Password"
                                     name="password"
                                     className="border border-gray-500 py-1 px-2 w-full mt-5"
-                                    // onChange={(e) => setPassword(e.target.value)}
+                                    value={password}
+                                    onChange={handlePassword}
                                 />
                             </div>
 
@@ -61,6 +106,7 @@ const Register = () => {
 
                             <div className="mt-5">
                                 <button
+                                    onClick={handleRegister}
                                     type="submit"
                                     className="w-full bg-purple-500 py-3 text-center text-white cursor-pointer"
                                 >
