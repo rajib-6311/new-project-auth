@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const { default: dbConnection } = require('./config/mongodb.js')
 const { default: userRouter } = require('./routes/userRouter.js')
+const { default: productRouter } = require('./routes/productRouter.js')
 
 require('dotenv').config()
 const app = express()
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/user', userRouter)
+app.use('/api/product', productRouter)
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
